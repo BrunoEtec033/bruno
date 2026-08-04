@@ -1,0 +1,1119 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Mock API - Treinamentos",
+    "version": "1.0.0",
+    "description": "API Fake para desenvolvimento do aplicativo de gestão de treinamentos. Construída com json-server e Express."
+  },
+  "servers": [
+    { "url": "http://localhost:3000", "description": "Servidor local de desenvolvimento" }
+  ],
+  "tags": [
+    { "name": "Sistema",                   "description": "Endpoints de infraestrutura da API" },
+    { "name": "Autenticação",              "description": "Login e dados do usuário logado" },
+    { "name": "Dashboard",                 "description": "Resumo geral do sistema" },
+    { "name": "Funcionários",              "description": "Gestão de funcionários da empresa" },
+    { "name": "Instrutores",               "description": "Gestão de instrutores de treinamento" },
+    { "name": "Usuários",                  "description": "Gestão de usuários do sistema" },
+    { "name": "Perfis",                    "description": "Perfis de acesso ao sistema" },
+    { "name": "Permissões",                "description": "Permissões do sistema" },
+    { "name": "Perfil Permissões",         "description": "Vínculo entre perfis e permissões" },
+    { "name": "Usuário Perfis",            "description": "Vínculo entre usuários e perfis" },
+    { "name": "Treinamentos",              "description": "Gestão de treinamentos" },
+    { "name": "Treinamento Responsáveis",  "description": "Responsáveis por treinamentos" },
+    { "name": "Treinamento Instrutores",   "description": "Instrutores vinculados a treinamentos" },
+    { "name": "Treinamento Participantes", "description": "Participantes de treinamentos" },
+    { "name": "Assinaturas",               "description": "Assinaturas de lista de presença" },
+    { "name": "Evidências",                "description": "Evidências de treinamento" },
+    { "name": "Certificados",              "description": "Certificados de conclusão" },
+    { "name": "Auditorias",               "description": "Log de auditoria do sistema" }
+  ],
+  "security": [{"BearerAuth": []}],
+  "paths": {
+    "/": {
+      "get": {
+        "tags": ["Sistema"],
+        "summary": "Informações da API",
+        "description": "Retorna metadados da API e lista de rotas disponíveis",
+        "responses": {
+          "200": {
+            "description": "Metadados da API",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "nome":     { "type": "string" },
+                    "versao":   { "type": "string" },
+                    "descricao":{ "type": "string" },
+                    "dataHora": { "type": "string", "format": "date-time" },
+                    "rotas":    { "type": "array", "items": { "type": "string" } }
+                  }
+                },
+                "example": {
+                  "nome": "Mock API - Treinamentos",
+                  "versao": "1.0.0",
+                  "descricao": "API Fake para desenvolvimento do aplicativo de gestão de treinamentos",
+                  "dataHora": "2026-08-04T10:00:00.000Z",
+                  "rotas": ["GET /api/funcionarios", "GET /health"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": ["Sistema"],
+        "summary": "Health check",
+        "description": "Verifica se o servidor está em execução",
+        "responses": {
+          "200": {
+            "description": "Servidor operacional",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "status": { "type": "string", "enum": ["UP"] } }
+                },
+                "example": { "status": "UP" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/login": {
+      "post": {
+        "security": [],
+        "tags": ["Autenticação"],
+        "summary": "Login",
+        "description": "Autentica o usuário e retorna um token simulado. Não valida senha.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/LoginRequest" },
+              "example": { "email": "carlo.souza@empresa.com", "senha": "senhaSegura123" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login realizado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/LoginResponse" },
+                "example": {
+                  "token": "token-fake",
+                  "refreshToken": "refresh-token-fake",
+                  "usuario": { "id": 1, "email": "carlo.souza@empresa.com", "funcionarioId": 1, "ativo": true, "criadoEm": "2026-01-10T08:00:00.000Z" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/me": {
+      "get": {
+        "tags": ["Autenticação"],
+        "summary": "Usuário logado",
+        "description": "Retorna dados do usuário logado com funcionário e perfis associados",
+        "responses": {
+          "200": {
+            "description": "Dados do usuário logado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/MeResponse" },
+                "example": {
+                  "usuario": { "id": 1, "email": "carlo.souza@empresa.com", "funcionarioId": 1, "ativo": true, "criadoEm": "2026-01-10T08:00:00.000Z" },
+                  "funcionario": { "id": 1, "nome": "Carlos Souza", "matricula": "F001", "cargo": "Analista de Qualidade", "setor": "Qualidade" },
+                  "perfis": [{ "id": 1, "nome": "Administrador", "descricao": "Acesso total ao sistema" }]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/dashboard": {
+      "get": {
+        "tags": ["Dashboard"],
+        "summary": "Resumo do sistema",
+        "description": "Retorna contadores dos principais recursos do sistema",
+        "responses": {
+          "200": {
+            "description": "Resumo do sistema",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Dashboard" },
+                "example": { "quantidadeFuncionarios": 1, "quantidadeUsuarios": 1, "quantidadeTreinamentos": 1, "quantidadeInstrutores": 1, "quantidadeCertificados": 1 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/funcionarios": {
+      "get": {
+        "tags": ["Funcionários"],
+        "summary": "Listar funcionários",
+        "description": "Retorna a lista de funcionários",
+        "parameters": [
+          { "$ref": "#/components/parameters/Pagina" },
+          { "$ref": "#/components/parameters/Limite" },
+          { "$ref": "#/components/parameters/Ordenar" },
+          { "$ref": "#/components/parameters/Ordem" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de funcionários",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Funcionario" } },
+                "example": [{ "id": 1, "nome": "Carlos Souza", "matricula": "F001", "cargo": "Analista de Qualidade", "setor": "Qualidade" }]
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Funcionários"],
+        "summary": "Criar funcionário",
+        "description": "Cria um novo funcionário",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Funcionario" },
+              "example": { "nome": "Maria Oliveira", "matricula": "F002", "cargo": "Técnico de Segurança", "setor": "Operações" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Funcionário criado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Funcionario" },
+                "example": { "id": 2, "nome": "Maria Oliveira", "matricula": "F002", "cargo": "Técnico de Segurança", "setor": "Operações" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/funcionarios/{id}": {
+      "get": {
+        "tags": ["Funcionários"],
+        "summary": "Buscar funcionário por ID",
+        "parameters": [{ "$ref": "#/components/parameters/IdPath" }],
+        "responses": {
+          "200": { "description": "Funcionário encontrado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Funcionario" }, "example": { "id": 1, "nome": "Carlos Souza", "matricula": "F001", "cargo": "Analista de Qualidade", "setor": "Qualidade" } } } },
+          "404": { "$ref": "#/components/responses/NaoEncontrado" }
+        }
+      },
+      "put": {
+        "tags": ["Funcionários"],
+        "summary": "Substituir funcionário",
+        "parameters": [{ "$ref": "#/components/parameters/IdPath" }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Funcionario" }, "example": { "nome": "Carlos Souza", "matricula": "F001", "cargo": "Analista Sênior", "setor": "Qualidade" } } } },
+        "responses": {
+          "200": { "description": "Funcionário atualizado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Funcionario" } } } },
+          "404": { "$ref": "#/components/responses/NaoEncontrado" }
+        }
+      },
+      "patch": {
+        "tags": ["Funcionários"],
+        "summary": "Atualizar funcionário parcialmente",
+        "parameters": [{ "$ref": "#/components/parameters/IdPath" }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Funcionario" }, "example": { "cargo": "Analista Sênior" } } } },
+        "responses": {
+          "200": { "description": "Funcionário atualizado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Funcionario" } } } },
+          "404": { "$ref": "#/components/responses/NaoEncontrado" }
+        }
+      },
+      "delete": {
+        "tags": ["Funcionários"],
+        "summary": "Excluir funcionário",
+        "parameters": [{ "$ref": "#/components/parameters/IdPath" }],
+        "responses": {
+          "200": { "description": "Funcionário excluído com sucesso" },
+          "404": { "$ref": "#/components/responses/NaoEncontrado" }
+        }
+      }
+    },
+    "/api/instrutores": {
+      "get": {
+        "tags": ["Instrutores"],
+        "summary": "Listar instrutores",
+        "parameters": [{ "$ref": "#/components/parameters/Pagina" }, { "$ref": "#/components/parameters/Limite" }, { "$ref": "#/components/parameters/Ordenar" }, { "$ref": "#/components/parameters/Ordem" }],
+        "responses": { "200": { "description": "Lista de instrutores", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Instrutor" } }, "example": [{ "id": 1, "nome": "Marcos Oliveira", "especialidade": "Segurança do Trabalho", "registro": "CREA-SP-123456", "email": "marcos.oliveira@empresa.com", "interno": true }] } } } }
+      },
+      "post": {
+        "tags": ["Instrutores"],
+        "summary": "Criar instrutor",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Instrutor" }, "example": { "nome": "João Silva", "especialidade": "Primeiros Socorros", "registro": "CFM-98765", "email": "joao.silva@empresa.com", "interno": false } } } },
+        "responses": { "201": { "description": "Instrutor criado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Instrutor" } } } } }
+      }
+    },
+    "/api/instrutores/{id}": {
+      "get": {
+        "tags": ["Instrutores"],
+        "summary": "Buscar instrutor por ID",
+        "parameters": [{ "$ref": "#/components/parameters/IdPath" }],
+        "responses": { "200": { "description": "Instrutor encontrado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Instrutor" } } } }, "404": { "$ref": "#/components/responses/NaoEncontrado" } }
+      },
+      "put": {
+        "tags": ["Instrutores"],
+        "summary": "Substituir instrutor",
+        "parameters": [{ "$ref": "#/components/parameters/IdPath" }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Instrutor" } } } },
+        "responses": { "200": { "description": "Instrutor atualizado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Instrutor" } } } }, "404": { "$ref": "#/components/responses/NaoEncontrado" } }
+      },
+      "patch": {
+        "tags": ["Instrutores"],
+        "summary": "Atualizar instrutor parcialmente",
+        "parameters": [{ "$ref": "#/components/parameters/IdPath" }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Instrutor" }, "example": { "especialidade": "Segurança e Saúde" } } } },
+        "responses": { "200": { "description": "Instrutor atualizado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Instrutor" } } } }, "404": { "$ref": "#/components/responses/NaoEncontrado" } }
+      },
+      "delete": {
+        "tags": ["Instrutores"],
+        "summary": "Excluir instrutor",
+        "parameters": [{ "$ref": "#/components/parameters/IdPath" }],
+        "responses": { "200": { "description": "Instrutor excluído" }, "404": { "$ref": "#/components/responses/NaoEncontrado" } }
+      }
+    },
+    "/api/usuarios": {
+      "get": {
+        "tags": ["Usuários"],
+        "summary": "Listar usuários",
+        "parameters": [{ "$ref": "#/components/parameters/Pagina" }, { "$ref": "#/components/parameters/Limite" }, { "$ref": "#/components/parameters/Ordenar" }, { "$ref": "#/components/parameters/Ordem" }],
+        "responses": { "200": { "description": "Lista de usuários", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Usuario" } }, "example": [{ "id": 1, "email": "carlo.souza@empresa.com", "funcionarioId": 1, "ativo": true, "criadoEm": "2026-01-10T08:00:00.000Z" }] } } } }
+      },
+      "post": {
+        "tags": ["Usuários"],
+        "summary": "Criar usuário",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Usuario" }, "example": { "email": "novo@empresa.com", "senha": "senha123", "funcionarioId": 2, "ativo": true, "criadoEm": "2026-08-04T00:00:00.000Z" } } } },
+        "responses": { "201": { "description": "Usuário criado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Usuario" } } } } }
+      }
+    },
+    "/api/usuarios/{id}": {
+      "get": {
+        "tags": ["Usuários"],
+        "summary": "Buscar usuário por ID",
+        "parameters": [{ "$ref": "#/components/parameters/IdPath" }],
+        "responses": { "200": { "description": "Usuário encontrado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Usuario" } } } }, "404": { "$ref": "#/components/responses/NaoEncontrado" } }
+      },
+      "put": {
+        "tags": ["Usuários"],
+        "summary": "Substituir usuário",
+        "parameters": [{ "$ref": "#/components/parameters/IdPath" }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Usuario" } } } },
+        "responses": { "200": { "description": "Usuário atualizado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Usuario" } } } }, "404": { "$ref": "#/components/responses/NaoEncontrado" } }
+      },
+      "patch": {
+        "tags": ["Usuários"],
+        "summary": "Atualizar usuário parcialmente",
+        "parameters": [{ "$ref": "#/components/parameters/IdPath" }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Usuario" }, "example": { "ativo": false } } } },
+        "responses": { "200": { "description": "Usuário atualizado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Usuario" } } } }, "404": { "$ref": "#/components/responses/NaoEncontrado" } }
+      },
+      "delete": {
+        "tags": ["Usuários"],
+        "summary": "Excluir usuário",
+        "parameters": [{ "$ref": "#/components/parameters/IdPath" }],
+        "responses": { "200": { "description": "Usuário excluído" }, "404": { "$ref": "#/components/responses/NaoEncontrado" } }
+      }
+    },
+    "/api/perfis": {
+      "get": {
+        "tags": ["Perfis"],
+        "summary": "Listar perfis",
+        "parameters": [{ "$ref": "#/components/parameters/Pagina" }, { "$ref": "#/components/parameters/Limite" }, { "$ref": "#/components/parameters/Ordenar" }, { "$ref": "#/components/parameters/Ordem" }],
+        "responses": { "200": { "description": "Lista de perfis", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Perfil" } }, "example": [{ "id": 1, "nome": "Administrador", "descricao": "Acesso total ao sistema" }] } } } }
+      },
+      "post": {
+        "tags": ["Perfis"],
+        "summary": "Criar perfil",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Perfil" }, "example": { "nome": "Operador", "descricao": "Acesso somente leitura" } } } },
+        "responses": { "201": { "description": "Perfil criado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Perfil" } } } } }
+      }
+    },
+    "/api/perfis/{id}": {
+      "get": {
+        "tags": ["Perfis"],
+        "summary": "Buscar perfil por ID",
+        "parameters": [{ "$ref": "#/components/parameters/IdPath" }],
+        "responses": { "200": { "description": "Perfil encontrado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Perfil" } } } }, "404": { "$ref": "#/components/responses/NaoEncontrado" } }
+      },
+      "put": {
+        "tags": ["Perfis"],
+        "summary": "Substituir perfil",
+        "parameters": [{ "$ref": "#/components/parameters/IdPath" }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Perfil" } } } },
+        "responses": { "200": { "description": "Perfil atualizado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Perfil" } } } }, "404": { "$ref": "#/components/responses/NaoEncontrado" } }
+      },
+      "patch": {
+        "tags": ["Perfis"],
+        "summary": "Atualizar perfil parcialmente",
+        "parameters": [{ "$ref": "#/components/parameters/IdPath" }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Perfil" }, "example": { "descricao": "Acesso de leitura e edição" } } } },
+        "responses": { "200": { "description": "Perfil atualizado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Perfil" } } } }, "404": { "$ref": "#/components/responses/NaoEncontrado" } }
+      },
+      "delete": {
+        "tags": ["Perfis"],
+        "summary": "Excluir perfil",
+        "parameters": [{ "$ref": "#/components/parameters/IdPath" }],
+        "responses": { "200": { "description": "Perfil excluído" }, "404": { "$ref": "#/components/responses/NaoEncontrado" } }
+      }
+    },
+    "/api/permissoes": {
+      "get": {
+        "tags": ["Permissões"],
+        "summary": "Listar permissões",
+        "parameters": [{ "$ref": "#/components/parameters/Pagina" }, { "$ref": "#/components/parameters/Limite" }, { "$ref": "#/components/parameters/Ordenar" }, { "$ref": "#/components/parameters/Ordem" }],
+        "responses": { "200": { "description": "Lista de permissões", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Permissao" } }, "example": [{ "id": 1, "codigo": "TREINAMENTOS:LISTAR", "recurso": "treinamentos", "metodo": "GET", "rotaTemplate": "/treinamentos", "descricao": "Permite visualizar a lista de treinamentos", "ehPublico": false }] } } } }
+      },
+      "post": {
+        "tags": ["Permissões"],
+        "summary": "Criar permissão",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Permissao" }, "example": { "codigo": "FUNCIONARIOS:LISTAR", "recurso": "funcionarios", "metodo": "GET", "rotaTemplate": "/funcionarios", "descricao": "Permite visualizar funcionários", "ehPublico": false } } } },
+        "responses": { "201": { "description": "Permissão criada", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Permissao" } } } } }
+      }
+    },
+    "/api/permissoes/{id}": {
+      "get": {
+        "tags": ["Permissões"],
+        "summary": "Buscar permissão por ID",
+        "parameters": [{ "$ref": "#/components/parameters/IdPath" }],
+        "responses": { "200": { "description": "Permissão encontrada", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Permissao" } } } }, "404": { "$ref": "#/components/responses/NaoEncontrado" } }
+      },
+      "put": {
+        "tags": ["Permissões"],
+        "summary": "Substituir permissão",
+        "parameters": [{ "$ref": "#/components/parameters/IdPath" }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Permissao" } } } },
+        "responses": { "200": { "description": "Permissão atualizada", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Permissao" } } } }, "404": { "$ref": "#/components/responses/NaoEncontrado" } }
+      },
+      "patch": {
+        "tags": ["Permissões"],
+        "summary": "Atualizar permissão parcialmente",
+        "parameters": [{ "$ref": "#/components/parameters/IdPath" }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Permissao" }, "example": { "ehPublico": true } } } },
+        "responses": { "200": { "description": "Permissão atualizada", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Permissao" } } } }, "404": { "$ref": "#/components/responses/NaoEncontrado" } }
+      },
+      "delete": {
+        "tags": ["Permissões"],
+        "summary": "Excluir permissão",
+        "parameters": [{ "$ref": "#/components/parameters/IdPath" }],
+        "responses": { "200": { "description": "Permissão excluída" }, "404": { "$ref": "#/components/responses/NaoEncontrado" } }
+      }
+    },
+    "/api/perfilPermissoes": {
+      "get": {
+        "tags": ["Perfil Permissões"],
+        "summary": "Listar vínculos perfil-permissão",
+        "parameters": [{ "$ref": "#/components/parameters/Pagina" }, { "$ref": "#/components/parameters/Limite" }, { "$ref": "#/components/parameters/Ordenar" }, { "$ref": "#/components/parameters/Ordem" }],
+        "responses": { "200": { "description": "Lista de vínculos", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/PerfilPermissao" } }, "example": [{ "id": 1, "perfilId": 1, "permissaoId": 1 }] } } } }
+      },
+      "post": {
+        "tags": ["Perfil Permissões"],
+        "summary": "Criar vínculo perfil-permissão",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PerfilPermissao" }, "example": { "perfilId": 1, "permissaoId": 3 } } } },
+        "responses": { "201": { "description": "Vínculo criado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PerfilPermissao" } } } } }
+      }
+    },
+    "/api/perfilPermissoes/{id}": {
+      "get": {
+        "tags": ["Perfil Permissões"],
+        "summary": "Buscar vínculo por ID",
+        "parameters": [{ "$ref": "#/components/parameters/IdPath" }],
+        "responses": { "200": { "description": "Vínculo encontrado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PerfilPermissao" } } } }, "404": { "$ref": "#/components/responses/NaoEncontrado" } }
+      },
+      "put": {
+        "tags": ["Perfil Permissões"],
+        "summary": "Substituir vínculo perfil-permissão",
+        "parameters": [{ "$ref": "#/components/parameters/IdPath" }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PerfilPermissao" } } } },
+        "responses": { "200": { "description": "Vínculo atualizado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PerfilPermissao" } } } }, "404": { "$ref": "#/components/responses/NaoEncontrado" } }
+      },
+      "patch": {
+        "tags": ["Perfil Permissões"],
+        "summary": "Atualizar vínculo parcialmente",
+        "parameters": [{ "$ref": "#/components/parameters/IdPath" }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PerfilPermissao" } } } },
+        "responses": { "200": { "description": "Vínculo atualizado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PerfilPermissao" } } } }, "404": { "$ref": "#/components/responses/NaoEncontrado" } }
+      },
+      "delete": {
+        "tags": ["Perfil Permissões"],
+        "summary": "Excluir vínculo perfil-permissão",
+        "parameters": [{ "$ref": "#/components/parameters/IdPath" }],
+        "responses": { "200": { "description": "Vínculo excluído" }, "404": { "$ref": "#/components/responses/NaoEncontrado" } }
+      }
+    },
+    "/api/usuarioPerfis": {
+      "get": {
+        "tags": ["Usuário Perfis"],
+        "summary": "Listar vínculos usuário-perfil",
+        "parameters": [{ "$ref": "#/components/parameters/Pagina" }, { "$ref": "#/components/parameters/Limite" }, { "$ref": "#/components/parameters/Ordenar" }, { "$ref": "#/components/parameters/Ordem" }],
+        "responses": { "200": { "description": "Lista de vínculos", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/UsuarioPerfil" } }, "example": [{ "id": 1, "usuarioId": 1, "perfilId": 1 }] } } } }
+      },
+      "post": {
+        "tags": ["Usuário Perfis"],
+        "summary": "Criar vínculo usuário-perfil",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UsuarioPerfil" }, "example": { "usuarioId": 2, "perfilId": 1 } } } },
+        "responses": { "201": { "description": "Vínculo criado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UsuarioPerfil" } } } } }
+      }
+    },
+    "/api/usuarioPerfis/{id}": {
+      "get": {
+        "tags": ["Usuário Perfis"],
+        "summary": "Buscar vínculo por ID",
+        "parameters": [{ "$ref": "#/components/parameters/IdPath" }],
+        "responses": { "200": { "description": "Vínculo encontrado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UsuarioPerfil" } } } }, "404": { "$ref": "#/components/responses/NaoEncontrado" } }
+      },
+      "put": {
+        "tags": ["Usuário Perfis"],
+        "summary": "Substituir vínculo usuário-perfil",
+        "parameters": [{ "$ref": "#/components/parameters/IdPath" }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UsuarioPerfil" } } } },
+        "responses": { "200": { "description": "Vínculo atualizado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UsuarioPerfil" } } } }, "404": { "$ref": "#/components/responses/NaoEncontrado" } }
+      },
+      "patch": {
+        "tags": ["Usuário Perfis"],
+        "summary": "Atualizar vínculo parcialmente",
+        "parameters": [{ "$ref": "#/components/parameters/IdPath" }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UsuarioPerfil" } } } },
+        "responses": { "200": { "description": "Vínculo atualizado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UsuarioPerfil" } } } }, "404": { "$ref": "#/components/responses/NaoEncontrado" } }
+      },
+      "delete": {
+        "tags": ["Usuário Perfis"],
+        "summary": "Excluir vínculo usuário-perfil",
+        "parameters": [{ "$ref": "#/components/parameters/IdPath" }],
+        "responses": { "200": { "description": "Vínculo excluído" }, "404": { "$ref": "#/components/responses/NaoEncontrado" } }
+      }
+    },
+    "/api/treinamentos": {
+      "get": {
+        "tags": ["Treinamentos"],
+        "summary": "Listar treinamentos",
+        "description": "Retorna a lista de treinamentos",
+        "parameters": [
+          { "$ref": "#/components/parameters/Pagina" },
+          { "$ref": "#/components/parameters/Limite" },
+          { "$ref": "#/components/parameters/Ordenar" },
+          { "$ref": "#/components/parameters/Ordem" },
+          { "name": "status", "in": "query", "required": false, "description": "Filtrar por status", "schema": { "type": "string", "enum": ["pendente", "em_andamento", "concluido", "cancelado"] } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de treinamentos",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Treinamento" } },
+                "example": [{ "id": 1, "titulo": "NR-35 - Trabalho em Altura", "descricao": "Treinamento obrigatório conforme Norma Regulamentadora 35", "cargaHoraria": 8, "status": "concluido", "dataInicio": "2026-03-10T08:00:00.000Z", "dataFim": "2026-03-10T17:00:00.000Z" }]
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Treinamentos"],
+        "summary": "Criar treinamento",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Treinamento" },
+              "example": { "titulo": "NR-10 - Segurança em Instalações Elétricas", "descricao": "Treinamento conforme NR-10", "cargaHoraria": 16, "status": "pendente", "dataInicio": "2026-09-01T08:00:00.000Z", "dataFim": "2026-09-02T17:00:00.000Z" }
+            }
+          }
+        },
+        "responses": { "201": { "description": "Treinamento criado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Treinamento" } } } } }
+      }
+    },
+    "/api/treinamentos/{id}": {
+      "get": {
+        "tags": ["Treinamentos"],
+        "summary": "Buscar treinamento por ID",
+        "parameters": [{ "$ref": "#/components/parameters/IdPath" }],
+        "responses": {
+          "200": { "description": "Treinamento encontrado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Treinamento" }, "example": { "id": 1, "titulo": "NR-35 - Trabalho em Altura", "descricao": "Treinamento obrigatório conforme Norma Regulamentadora 35", "cargaHoraria": 8, "status": "concluido", "dataInicio": "2026-03-10T08:00:00.000Z", "dataFim": "2026-03-10T17:00:00.000Z" } } } },
+          "404": { "$ref": "#/components/responses/NaoEncontrado" }
+        }
+      },
+      "put": {
+        "tags": ["Treinamentos"],
+        "summary": "Substituir treinamento",
+        "parameters": [{ "$ref": "#/components/parameters/IdPath" }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Treinamento" } } } },
+        "responses": { "200": { "description": "Treinamento atualizado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Treinamento" } } } }, "404": { "$ref": "#/components/responses/NaoEncontrado" } }
+      },
+      "patch": {
+        "tags": ["Treinamentos"],
+        "summary": "Atualizar treinamento parcialmente",
+        "parameters": [{ "$ref": "#/components/parameters/IdPath" }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Treinamento" }, "example": { "status": "em_andamento" } } } },
+        "responses": { "200": { "description": "Treinamento atualizado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Treinamento" } } } }, "404": { "$ref": "#/components/responses/NaoEncontrado" } }
+      },
+      "delete": {
+        "tags": ["Treinamentos"],
+        "summary": "Excluir treinamento",
+        "parameters": [{ "$ref": "#/components/parameters/IdPath" }],
+        "responses": { "200": { "description": "Treinamento excluído" }, "404": { "$ref": "#/components/responses/NaoEncontrado" } }
+      }
+    },
+    "/api/treinamentos/{id}/completo": {
+      "get": {
+        "tags": ["Treinamentos"],
+        "summary": "Buscar treinamento completo",
+        "description": "Retorna o treinamento com instrutores, responsáveis, participantes e evidências",
+        "parameters": [{ "$ref": "#/components/parameters/IdPath" }],
+        "responses": {
+          "200": {
+            "description": "Treinamento completo",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/TreinamentoCompleto" },
+                "example": {
+                  "treinamento": { "id": 1, "titulo": "NR-35 - Trabalho em Altura", "descricao": "Treinamento obrigatório conforme Norma Regulamentadora 35", "cargaHoraria": 8, "status": "concluido", "dataInicio": "2026-03-10T08:00:00.000Z", "dataFim": "2026-03-10T17:00:00.000Z" },
+                  "instrutores": [{ "id": 1, "nome": "Marcos Oliveira", "especialidade": "Segurança do Trabalho", "registro": "CREA-SP-123456", "email": "marcos.oliveira@empresa.com", "interno": true }],
+                  "responsaveis": [{ "id": 1, "email": "carlo.souza@empresa.com", "funcionarioId": 1, "ativo": true, "criadoEm": "2026-01-10T08:00:00.000Z" }],
+                  "participantes": [{ "id": 1, "treinamentoId": 1, "funcionarioId": 1, "status": "aprovado", "inscritoEm": "2026-03-01T09:00:00.000Z" }],
+                  "evidencias": [{ "id": 1, "treinamentoId": 1, "tipo": "foto", "descricao": "Foto do participante durante a prática em altura", "arquivo": "evidencia_carlos_souza_nr35_2026.jpg", "registradoEm": "2026-03-10T14:00:00.000Z" }]
+                }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NaoEncontrado" }
+        }
+      }
+    },
+    "/api/treinamentoResponsaveis": {
+      "get": {
+        "tags": ["Treinamento Responsáveis"],
+        "summary": "Listar responsáveis por treinamento",
+        "parameters": [{ "$ref": "#/components/parameters/Pagina" }, { "$ref": "#/components/parameters/Limite" }, { "$ref": "#/components/parameters/Ordenar" }, { "$ref": "#/components/parameters/Ordem" }],
+        "responses": { "200": { "description": "Lista de responsáveis", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/TreinamentoResponsavel" } }, "example": [{ "id": 1, "treinamentoId": 1, "usuarioId": 1 }] } } } }
+      },
+      "post": {
+        "tags": ["Treinamento Responsáveis"],
+        "summary": "Criar responsável por treinamento",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TreinamentoResponsavel" }, "example": { "treinamentoId": 1, "usuarioId": 2 } } } },
+        "responses": { "201": { "description": "Responsável criado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TreinamentoResponsavel" } } } } }
+      }
+    },
+    "/api/treinamentoResponsaveis/{id}": {
+      "get": {
+        "tags": ["Treinamento Responsáveis"],
+        "summary": "Buscar responsável por ID",
+        "parameters": [{ "$ref": "#/components/parameters/IdPath" }],
+        "responses": { "200": { "description": "Responsável encontrado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TreinamentoResponsavel" } } } }, "404": { "$ref": "#/components/responses/NaoEncontrado" } }
+      },
+      "put": { "tags": ["Treinamento Responsáveis"], "summary": "Substituir responsável", "parameters": [{ "$ref": "#/components/parameters/IdPath" }], "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TreinamentoResponsavel" } } } }, "responses": { "200": { "description": "Responsável atualizado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TreinamentoResponsavel" } } } }, "404": { "$ref": "#/components/responses/NaoEncontrado" } } },
+      "patch": { "tags": ["Treinamento Responsáveis"], "summary": "Atualizar responsável parcialmente", "parameters": [{ "$ref": "#/components/parameters/IdPath" }], "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TreinamentoResponsavel" } } } }, "responses": { "200": { "description": "Responsável atualizado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TreinamentoResponsavel" } } } }, "404": { "$ref": "#/components/responses/NaoEncontrado" } } },
+      "delete": { "tags": ["Treinamento Responsáveis"], "summary": "Excluir responsável", "parameters": [{ "$ref": "#/components/parameters/IdPath" }], "responses": { "200": { "description": "Responsável excluído" }, "404": { "$ref": "#/components/responses/NaoEncontrado" } } }
+    },
+    "/api/treinamentoInstrutores": {
+      "get": {
+        "tags": ["Treinamento Instrutores"],
+        "summary": "Listar instrutores por treinamento",
+        "parameters": [{ "$ref": "#/components/parameters/Pagina" }, { "$ref": "#/components/parameters/Limite" }, { "$ref": "#/components/parameters/Ordenar" }, { "$ref": "#/components/parameters/Ordem" }],
+        "responses": { "200": { "description": "Lista de instrutores vinculados", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/TreinamentoInstrutor" } }, "example": [{ "id": 1, "treinamentoId": 1, "instrutorId": 1 }] } } } }
+      },
+      "post": {
+        "tags": ["Treinamento Instrutores"],
+        "summary": "Vincular instrutor a treinamento",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TreinamentoInstrutor" }, "example": { "treinamentoId": 1, "instrutorId": 2 } } } },
+        "responses": { "201": { "description": "Vínculo criado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TreinamentoInstrutor" } } } } }
+      }
+    },
+    "/api/treinamentoInstrutores/{id}": {
+      "get": { "tags": ["Treinamento Instrutores"], "summary": "Buscar vínculo por ID", "parameters": [{ "$ref": "#/components/parameters/IdPath" }], "responses": { "200": { "description": "Vínculo encontrado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TreinamentoInstrutor" } } } }, "404": { "$ref": "#/components/responses/NaoEncontrado" } } },
+      "put": { "tags": ["Treinamento Instrutores"], "summary": "Substituir vínculo", "parameters": [{ "$ref": "#/components/parameters/IdPath" }], "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TreinamentoInstrutor" } } } }, "responses": { "200": { "description": "Vínculo atualizado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TreinamentoInstrutor" } } } }, "404": { "$ref": "#/components/responses/NaoEncontrado" } } },
+      "patch": { "tags": ["Treinamento Instrutores"], "summary": "Atualizar vínculo parcialmente", "parameters": [{ "$ref": "#/components/parameters/IdPath" }], "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TreinamentoInstrutor" } } } }, "responses": { "200": { "description": "Vínculo atualizado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TreinamentoInstrutor" } } } }, "404": { "$ref": "#/components/responses/NaoEncontrado" } } },
+      "delete": { "tags": ["Treinamento Instrutores"], "summary": "Excluir vínculo instrutor-treinamento", "parameters": [{ "$ref": "#/components/parameters/IdPath" }], "responses": { "200": { "description": "Vínculo excluído" }, "404": { "$ref": "#/components/responses/NaoEncontrado" } } }
+    },
+    "/api/treinamentoParticipantes": {
+      "get": {
+        "tags": ["Treinamento Participantes"],
+        "summary": "Listar participantes de treinamentos",
+        "parameters": [
+          { "$ref": "#/components/parameters/Pagina" }, { "$ref": "#/components/parameters/Limite" }, { "$ref": "#/components/parameters/Ordenar" }, { "$ref": "#/components/parameters/Ordem" },
+          { "name": "treinamentoId", "in": "query", "required": false, "description": "Filtrar por treinamento", "schema": { "type": "integer" } },
+          { "name": "funcionarioId", "in": "query", "required": false, "description": "Filtrar por funcionário", "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Lista de participantes", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/TreinamentoParticipante" } }, "example": [{ "id": 1, "treinamentoId": 1, "funcionarioId": 1, "status": "aprovado", "inscritoEm": "2026-03-01T09:00:00.000Z" }] } } } }
+      },
+      "post": {
+        "tags": ["Treinamento Participantes"],
+        "summary": "Inscrever participante em treinamento",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TreinamentoParticipante" }, "example": { "treinamentoId": 1, "funcionarioId": 2, "status": "pendente", "inscritoEm": "2026-08-04T10:00:00.000Z" } } } },
+        "responses": { "201": { "description": "Participante inscrito", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TreinamentoParticipante" } } } } }
+      }
+    },
+    "/api/treinamentoParticipantes/{id}": {
+      "get": {
+        "tags": ["Treinamento Participantes"],
+        "summary": "Buscar participante por ID",
+        "parameters": [{ "$ref": "#/components/parameters/IdPath" }],
+        "responses": { "200": { "description": "Participante encontrado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TreinamentoParticipante" } } } }, "404": { "$ref": "#/components/responses/NaoEncontrado" } }
+      },
+      "put": { "tags": ["Treinamento Participantes"], "summary": "Substituir participante", "parameters": [{ "$ref": "#/components/parameters/IdPath" }], "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TreinamentoParticipante" } } } }, "responses": { "200": { "description": "Participante atualizado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TreinamentoParticipante" } } } }, "404": { "$ref": "#/components/responses/NaoEncontrado" } } },
+      "patch": { "tags": ["Treinamento Participantes"], "summary": "Atualizar participante parcialmente", "parameters": [{ "$ref": "#/components/parameters/IdPath" }], "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TreinamentoParticipante" }, "example": { "status": "aprovado" } } } }, "responses": { "200": { "description": "Participante atualizado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TreinamentoParticipante" } } } }, "404": { "$ref": "#/components/responses/NaoEncontrado" } } },
+      "delete": { "tags": ["Treinamento Participantes"], "summary": "Excluir participante", "parameters": [{ "$ref": "#/components/parameters/IdPath" }], "responses": { "200": { "description": "Participante excluído" }, "404": { "$ref": "#/components/responses/NaoEncontrado" } } }
+    },
+    "/api/assinaturas": {
+      "get": {
+        "tags": ["Assinaturas"],
+        "summary": "Listar assinaturas",
+        "parameters": [{ "$ref": "#/components/parameters/Pagina" }, { "$ref": "#/components/parameters/Limite" }, { "$ref": "#/components/parameters/Ordenar" }, { "$ref": "#/components/parameters/Ordem" }],
+        "responses": { "200": { "description": "Lista de assinaturas", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Assinatura" } }, "example": [{ "id": 1, "treinamentoParticipantesId": 1, "tipo": "lista_de_presenca", "assinadoEm": "2026-03-10T08:30:00.000Z", "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855" }] } } } }
+      },
+      "post": {
+        "tags": ["Assinaturas"],
+        "summary": "Registrar assinatura",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Assinatura" }, "example": { "treinamentoParticipantesId": 2, "tipo": "lista_de_presenca", "assinadoEm": "2026-08-04T09:00:00.000Z", "hash": "abc123" } } } },
+        "responses": { "201": { "description": "Assinatura registrada", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Assinatura" } } } } }
+      }
+    },
+    "/api/assinaturas/{id}": {
+      "get": { "tags": ["Assinaturas"], "summary": "Buscar assinatura por ID", "parameters": [{ "$ref": "#/components/parameters/IdPath" }], "responses": { "200": { "description": "Assinatura encontrada", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Assinatura" } } } }, "404": { "$ref": "#/components/responses/NaoEncontrado" } } },
+      "put": { "tags": ["Assinaturas"], "summary": "Substituir assinatura", "parameters": [{ "$ref": "#/components/parameters/IdPath" }], "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Assinatura" } } } }, "responses": { "200": { "description": "Assinatura atualizada", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Assinatura" } } } }, "404": { "$ref": "#/components/responses/NaoEncontrado" } } },
+      "patch": { "tags": ["Assinaturas"], "summary": "Atualizar assinatura parcialmente", "parameters": [{ "$ref": "#/components/parameters/IdPath" }], "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Assinatura" } } } }, "responses": { "200": { "description": "Assinatura atualizada", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Assinatura" } } } }, "404": { "$ref": "#/components/responses/NaoEncontrado" } } },
+      "delete": { "tags": ["Assinaturas"], "summary": "Excluir assinatura", "parameters": [{ "$ref": "#/components/parameters/IdPath" }], "responses": { "200": { "description": "Assinatura excluída" }, "404": { "$ref": "#/components/responses/NaoEncontrado" } } }
+    },
+    "/api/evidencias": {
+      "get": {
+        "tags": ["Evidências"],
+        "summary": "Listar evidências",
+        "parameters": [
+          { "$ref": "#/components/parameters/Pagina" }, { "$ref": "#/components/parameters/Limite" }, { "$ref": "#/components/parameters/Ordenar" }, { "$ref": "#/components/parameters/Ordem" },
+          { "name": "treinamentoId", "in": "query", "required": false, "description": "Filtrar por treinamento", "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Lista de evidências", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Evidencia" } }, "example": [{ "id": 1, "treinamentoId": 1, "tipo": "foto", "descricao": "Foto do participante durante a prática em altura", "arquivo": "evidencia_carlos_souza_nr35_2026.jpg", "registradoEm": "2026-03-10T14:00:00.000Z" }] } } } }
+      },
+      "post": {
+        "tags": ["Evidências"],
+        "summary": "Registrar evidência",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Evidencia" }, "example": { "treinamentoId": 1, "tipo": "video", "descricao": "Vídeo da avaliação prática", "arquivo": "avaliacao_pratica_nr35.mp4", "registradoEm": "2026-03-10T15:00:00.000Z" } } } },
+        "responses": { "201": { "description": "Evidência registrada", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Evidencia" } } } } }
+      }
+    },
+    "/api/evidencias/{id}": {
+      "get": { "tags": ["Evidências"], "summary": "Buscar evidência por ID", "parameters": [{ "$ref": "#/components/parameters/IdPath" }], "responses": { "200": { "description": "Evidência encontrada", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Evidencia" } } } }, "404": { "$ref": "#/components/responses/NaoEncontrado" } } },
+      "put": { "tags": ["Evidências"], "summary": "Substituir evidência", "parameters": [{ "$ref": "#/components/parameters/IdPath" }], "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Evidencia" } } } }, "responses": { "200": { "description": "Evidência atualizada", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Evidencia" } } } }, "404": { "$ref": "#/components/responses/NaoEncontrado" } } },
+      "patch": { "tags": ["Evidências"], "summary": "Atualizar evidência parcialmente", "parameters": [{ "$ref": "#/components/parameters/IdPath" }], "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Evidencia" }, "example": { "descricao": "Vídeo atualizado da avaliação" } } } }, "responses": { "200": { "description": "Evidência atualizada", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Evidencia" } } } }, "404": { "$ref": "#/components/responses/NaoEncontrado" } } },
+      "delete": { "tags": ["Evidências"], "summary": "Excluir evidência", "parameters": [{ "$ref": "#/components/parameters/IdPath" }], "responses": { "200": { "description": "Evidência excluída" }, "404": { "$ref": "#/components/responses/NaoEncontrado" } } }
+    },
+    "/api/certificados": {
+      "get": {
+        "tags": ["Certificados"],
+        "summary": "Listar certificados",
+        "parameters": [
+          { "$ref": "#/components/parameters/Pagina" }, { "$ref": "#/components/parameters/Limite" }, { "$ref": "#/components/parameters/Ordenar" }, { "$ref": "#/components/parameters/Ordem" },
+          { "name": "status", "in": "query", "required": false, "description": "Filtrar por status", "schema": { "type": "string", "enum": ["valido", "expirado", "cancelado"] } }
+        ],
+        "responses": { "200": { "description": "Lista de certificados", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Certificado" } }, "example": [{ "id": 1, "treinamentoParticipantesId": 1, "numero": "CERT-2026-0001", "dataEmissao": "2026-03-11T08:00:00.000Z", "dataValidade": "2027-03-11T08:00:00.000Z", "status": "valido" }] } } } }
+      },
+      "post": {
+        "tags": ["Certificados"],
+        "summary": "Emitir certificado",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Certificado" }, "example": { "treinamentoParticipantesId": 2, "numero": "CERT-2026-0002", "dataEmissao": "2026-08-04T08:00:00.000Z", "dataValidade": "2027-08-04T08:00:00.000Z", "status": "valido" } } } },
+        "responses": { "201": { "description": "Certificado emitido", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Certificado" } } } } }
+      }
+    },
+    "/api/certificados/{id}": {
+      "get": {
+        "tags": ["Certificados"],
+        "summary": "Buscar certificado por ID",
+        "parameters": [{ "$ref": "#/components/parameters/IdPath" }],
+        "responses": {
+          "200": { "description": "Certificado encontrado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Certificado" }, "example": { "id": 1, "treinamentoParticipantesId": 1, "numero": "CERT-2026-0001", "dataEmissao": "2026-03-11T08:00:00.000Z", "dataValidade": "2027-03-11T08:00:00.000Z", "status": "valido" } } } },
+          "404": { "$ref": "#/components/responses/NaoEncontrado" }
+        }
+      },
+      "put": { "tags": ["Certificados"], "summary": "Substituir certificado", "parameters": [{ "$ref": "#/components/parameters/IdPath" }], "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Certificado" } } } }, "responses": { "200": { "description": "Certificado atualizado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Certificado" } } } }, "404": { "$ref": "#/components/responses/NaoEncontrado" } } },
+      "patch": { "tags": ["Certificados"], "summary": "Atualizar certificado parcialmente", "parameters": [{ "$ref": "#/components/parameters/IdPath" }], "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Certificado" }, "example": { "status": "expirado" } } } }, "responses": { "200": { "description": "Certificado atualizado", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Certificado" } } } }, "404": { "$ref": "#/components/responses/NaoEncontrado" } } },
+      "delete": { "tags": ["Certificados"], "summary": "Excluir certificado", "parameters": [{ "$ref": "#/components/parameters/IdPath" }], "responses": { "200": { "description": "Certificado excluído" }, "404": { "$ref": "#/components/responses/NaoEncontrado" } } }
+    },
+    "/api/certificados/{id}/completo": {
+      "get": {
+        "tags": ["Certificados"],
+        "summary": "Buscar certificado completo",
+        "description": "Retorna o certificado com participante, funcionário e treinamento",
+        "parameters": [{ "$ref": "#/components/parameters/IdPath" }],
+        "responses": {
+          "200": {
+            "description": "Certificado completo",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CertificadoCompleto" },
+                "example": {
+                  "certificado": { "id": 1, "treinamentoParticipantesId": 1, "numero": "CERT-2026-0001", "dataEmissao": "2026-03-11T08:00:00.000Z", "dataValidade": "2027-03-11T08:00:00.000Z", "status": "valido" },
+                  "participante": { "id": 1, "treinamentoId": 1, "funcionarioId": 1, "status": "aprovado", "inscritoEm": "2026-03-01T09:00:00.000Z" },
+                  "funcionario": { "id": 1, "nome": "Carlos Souza", "matricula": "F001", "cargo": "Analista de Qualidade", "setor": "Qualidade" },
+                  "treinamento": { "id": 1, "titulo": "NR-35 - Trabalho em Altura", "descricao": "Treinamento obrigatório conforme Norma Regulamentadora 35", "cargaHoraria": 8, "status": "concluido", "dataInicio": "2026-03-10T08:00:00.000Z", "dataFim": "2026-03-10T17:00:00.000Z" }
+                }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NaoEncontrado" }
+        }
+      }
+    },
+    "/api/auditorias": {
+      "get": {
+        "tags": ["Auditorias"],
+        "summary": "Listar registros de auditoria",
+        "parameters": [
+          { "$ref": "#/components/parameters/Pagina" }, { "$ref": "#/components/parameters/Limite" }, { "$ref": "#/components/parameters/Ordenar" }, { "$ref": "#/components/parameters/Ordem" },
+          { "name": "entidade", "in": "query", "required": false, "description": "Filtrar por entidade auditada", "schema": { "type": "string" } },
+          { "name": "usuarioId", "in": "query", "required": false, "description": "Filtrar por usuário", "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Lista de auditorias", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Auditoria" } }, "example": [{ "id": 1, "entidade": "certificados", "entidadeId": 1, "acao": "criacao", "usuarioId": 1, "detalhe": "Certificado CERT-2026-0001 emitido para Carlos Souza (NR-35)", "realizadoEm": "2026-03-11T08:01:00.000Z" }] } } } }
+      },
+      "post": {
+        "tags": ["Auditorias"],
+        "summary": "Registrar entrada de auditoria",
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Auditoria" }, "example": { "entidade": "treinamentos", "entidadeId": 1, "acao": "atualizacao", "usuarioId": 1, "detalhe": "Status atualizado para concluido", "realizadoEm": "2026-08-04T10:00:00.000Z" } } } },
+        "responses": { "201": { "description": "Auditoria registrada", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Auditoria" } } } } }
+      }
+    },
+    "/api/auditorias/{id}": {
+      "get": { "tags": ["Auditorias"], "summary": "Buscar auditoria por ID", "parameters": [{ "$ref": "#/components/parameters/IdPath" }], "responses": { "200": { "description": "Auditoria encontrada", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Auditoria" } } } }, "404": { "$ref": "#/components/responses/NaoEncontrado" } } },
+      "put": { "tags": ["Auditorias"], "summary": "Substituir auditoria", "parameters": [{ "$ref": "#/components/parameters/IdPath" }], "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Auditoria" } } } }, "responses": { "200": { "description": "Auditoria atualizada", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Auditoria" } } } }, "404": { "$ref": "#/components/responses/NaoEncontrado" } } },
+      "patch": { "tags": ["Auditorias"], "summary": "Atualizar auditoria parcialmente", "parameters": [{ "$ref": "#/components/parameters/IdPath" }], "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Auditoria" } } } }, "responses": { "200": { "description": "Auditoria atualizada", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Auditoria" } } } }, "404": { "$ref": "#/components/responses/NaoEncontrado" } } },
+      "delete": { "tags": ["Auditorias"], "summary": "Excluir auditoria", "parameters": [{ "$ref": "#/components/parameters/IdPath" }], "responses": { "200": { "description": "Auditoria excluída" }, "404": { "$ref": "#/components/responses/NaoEncontrado" } } }
+    }
+  },
+  "components": {
+    "parameters": {
+      "IdPath": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "description": "Identificador único do recurso",
+        "schema": { "type": "integer", "example": 1 }
+      },
+      "Pagina": {
+        "name": "_page",
+        "in": "query",
+        "required": false,
+        "description": "Número da página",
+        "schema": { "type": "integer", "default": 1, "example": 1 }
+      },
+      "Limite": {
+        "name": "_limit",
+        "in": "query",
+        "required": false,
+        "description": "Quantidade de itens por página",
+        "schema": { "type": "integer", "default": 10, "example": 10 }
+      },
+      "Ordenar": {
+        "name": "_sort",
+        "in": "query",
+        "required": false,
+        "description": "Campo para ordenação",
+        "schema": { "type": "string", "example": "id" }
+      },
+      "Ordem": {
+        "name": "_order",
+        "in": "query",
+        "required": false,
+        "description": "Direção da ordenação",
+        "schema": { "type": "string", "enum": ["asc", "desc"], "default": "asc" }
+      }
+    },
+    "responses": {
+      "NaoAutorizado": {
+        "description": "Token não informado ou inválido",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErroResposta" },
+            "example": { "success": false, "error": { "code": "UNAUTHORIZED", "message": "Token não informado." } }
+          }
+        }
+      },
+      "Proibido": {
+        "description": "Permissão insuficiente",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErroResposta" },
+            "example": { "success": false, "error": { "code": "FORBIDDEN", "message": "Permissão necessária: TREINAMENTOS:CRIAR" } }
+          }
+        }
+      },
+      "NaoEncontrado": {
+        "description": "Recurso não encontrado",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErroResposta" },
+            "example": { "success": false, "error": { "code": "NOT_FOUND", "message": "Registro não encontrado." } }
+          }
+        }
+      },
+      "Conflito": {
+        "description": "Conflito de dados (registro duplicado)",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErroResposta" },
+            "example": { "success": false, "error": { "code": "CONFLICT", "message": "E-mail já cadastrado." } }
+          }
+        }
+      },
+      "ErroValidacao": {
+        "description": "Dados inválidos ou campos obrigatórios ausentes",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErroResposta" },
+            "example": { "success": false, "error": { "code": "VALIDATION_ERROR", "message": "Campos obrigatórios ausentes: email, senha." } }
+          }
+        }
+      },
+      "ErroInterno": {
+        "description": "Erro interno simulado",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErroResposta" },
+            "example": { "success": false, "error": { "code": "INTERNAL_ERROR", "message": "Erro interno simulado." } }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "Funcionario": {
+        "type": "object",
+        "properties": {
+          "id":       { "type": "integer",  "example": 1 },
+          "nome":     { "type": "string",   "example": "Carlos Souza" },
+          "matricula":{ "type": "string",   "example": "F001" },
+          "cargo":    { "type": "string",   "example": "Analista de Qualidade" },
+          "setor":    { "type": "string",   "example": "Qualidade" }
+        }
+      },
+      "Instrutor": {
+        "type": "object",
+        "properties": {
+          "id":           { "type": "integer", "example": 1 },
+          "nome":         { "type": "string",  "example": "Marcos Oliveira" },
+          "especialidade":{ "type": "string",  "example": "Segurança do Trabalho" },
+          "registro":     { "type": "string",  "example": "CREA-SP-123456" },
+          "email":        { "type": "string",  "format": "email", "example": "marcos.oliveira@empresa.com" },
+          "interno":      { "type": "boolean", "example": true }
+        }
+      },
+      "Usuario": {
+        "type": "object",
+        "properties": {
+          "id":           { "type": "integer", "example": 1 },
+          "email":        { "type": "string",  "format": "email", "example": "carlo.souza@empresa.com" },
+          "funcionarioId":{ "type": "integer", "example": 1 },
+          "ativo":        { "type": "boolean", "example": true },
+          "criadoEm":     { "type": "string",  "format": "date-time", "example": "2026-01-10T08:00:00.000Z" }
+        }
+      },
+      "Perfil": {
+        "type": "object",
+        "properties": {
+          "id":      { "type": "integer", "example": 1 },
+          "nome":    { "type": "string",  "example": "Administrador" },
+          "descricao":{ "type": "string", "example": "Acesso total ao sistema" }
+        }
+      },
+      "Permissao": {
+        "type": "object",
+        "properties": {
+          "id":          { "type": "integer", "example": 1 },
+          "codigo":      { "type": "string",  "example": "TREINAMENTOS:LISTAR" },
+          "recurso":     { "type": "string",  "example": "treinamentos" },
+          "metodo":      { "type": "string",  "enum": ["GET","POST","PUT","PATCH","DELETE"], "example": "GET" },
+          "rotaTemplate":{ "type": "string",  "example": "/treinamentos" },
+          "descricao":   { "type": "string",  "example": "Permite visualizar a lista de treinamentos" },
+          "ehPublico":   { "type": "boolean", "example": false }
+        }
+      },
+      "PerfilPermissao": {
+        "type": "object",
+        "properties": {
+          "id":        { "type": "integer", "example": 1 },
+          "perfilId":  { "type": "integer", "example": 1 },
+          "permissaoId":{ "type": "integer","example": 1 }
+        }
+      },
+      "UsuarioPerfil": {
+        "type": "object",
+        "properties": {
+          "id":      { "type": "integer", "example": 1 },
+          "usuarioId":{ "type": "integer","example": 1 },
+          "perfilId":{ "type": "integer", "example": 1 }
+        }
+      },
+      "Treinamento": {
+        "type": "object",
+        "properties": {
+          "id":         { "type": "integer", "example": 1 },
+          "titulo":     { "type": "string",  "example": "NR-35 - Trabalho em Altura" },
+          "descricao":  { "type": "string",  "example": "Treinamento obrigatório conforme Norma Regulamentadora 35" },
+          "cargaHoraria":{ "type": "integer","example": 8 },
+          "status":     { "type": "string",  "enum": ["pendente","em_andamento","concluido","cancelado"], "example": "concluido" },
+          "dataInicio": { "type": "string",  "format": "date-time", "example": "2026-03-10T08:00:00.000Z" },
+          "dataFim":    { "type": "string",  "format": "date-time", "example": "2026-03-10T17:00:00.000Z" }
+        }
+      },
+      "TreinamentoResponsavel": {
+        "type": "object",
+        "properties": {
+          "id":          { "type": "integer", "example": 1 },
+          "treinamentoId":{ "type": "integer","example": 1 },
+          "usuarioId":   { "type": "integer", "example": 1 }
+        }
+      },
+      "TreinamentoInstrutor": {
+        "type": "object",
+        "properties": {
+          "id":          { "type": "integer", "example": 1 },
+          "treinamentoId":{ "type": "integer","example": 1 },
+          "instrutorId": { "type": "integer", "example": 1 }
+        }
+      },
+      "TreinamentoParticipante": {
+        "type": "object",
+        "properties": {
+          "id":          { "type": "integer", "example": 1 },
+          "treinamentoId":{ "type": "integer","example": 1 },
+          "funcionarioId":{ "type": "integer","example": 1 },
+          "status":      { "type": "string",  "enum": ["pendente","aprovado","reprovado"], "example": "aprovado" },
+          "inscritoEm":  { "type": "string",  "format": "date-time", "example": "2026-03-01T09:00:00.000Z" }
+        }
+      },
+      "Assinatura": {
+        "type": "object",
+        "properties": {
+          "id":                       { "type": "integer", "example": 1 },
+          "treinamentoParticipantesId":{ "type": "integer","example": 1 },
+          "tipo":                     { "type": "string",  "example": "lista_de_presenca" },
+          "assinadoEm":               { "type": "string",  "format": "date-time", "example": "2026-03-10T08:30:00.000Z" },
+          "hash":                     { "type": "string",  "example": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855" }
+        }
+      },
+      "Evidencia": {
+        "type": "object",
+        "properties": {
+          "id":          { "type": "integer", "example": 1 },
+          "treinamentoId":{ "type": "integer","example": 1 },
+          "tipo":        { "type": "string",  "example": "foto" },
+          "descricao":   { "type": "string",  "example": "Foto do participante durante a prática em altura" },
+          "arquivo":     { "type": "string",  "example": "evidencia_carlos_souza_nr35_2026.jpg" },
+          "registradoEm":{ "type": "string",  "format": "date-time", "example": "2026-03-10T14:00:00.000Z" }
+        }
+      },
+      "Certificado": {
+        "type": "object",
+        "properties": {
+          "id":                       { "type": "integer", "example": 1 },
+          "treinamentoParticipantesId":{ "type": "integer","example": 1 },
+          "numero":                   { "type": "string",  "example": "CERT-2026-0001" },
+          "dataEmissao":              { "type": "string",  "format": "date-time", "example": "2026-03-11T08:00:00.000Z" },
+          "dataValidade":             { "type": "string",  "format": "date-time", "example": "2027-03-11T08:00:00.000Z" },
+          "status":                   { "type": "string",  "enum": ["valido","expirado","cancelado"], "example": "valido" }
+        }
+      },
+      "Auditoria": {
+        "type": "object",
+        "properties": {
+          "id":         { "type": "integer", "example": 1 },
+          "entidade":   { "type": "string",  "example": "certificados" },
+          "entidadeId": { "type": "integer", "example": 1 },
+          "acao":       { "type": "string",  "example": "criacao" },
+          "usuarioId":  { "type": "integer", "example": 1 },
+          "detalhe":    { "type": "string",  "example": "Certificado CERT-2026-0001 emitido para Carlos Souza (NR-35)" },
+          "realizadoEm":{ "type": "string",  "format": "date-time", "example": "2026-03-11T08:01:00.000Z" }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "required": ["email", "senha"],
+        "properties": {
+          "email": { "type": "string", "format": "email", "example": "carlo.souza@empresa.com" },
+          "senha": { "type": "string", "example": "senhaSegura123" }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "token":        { "type": "string", "example": "token-fake" },
+          "refreshToken": { "type": "string", "example": "refresh-token-fake" },
+          "usuario":      { "$ref": "#/components/schemas/Usuario" }
+        }
+      },
+      "MeResponse": {
+        "type": "object",
+        "properties": {
+          "usuario":     { "$ref": "#/components/schemas/Usuario" },
+          "funcionario": { "$ref": "#/components/schemas/Funcionario" },
+          "perfis":      { "type": "array", "items": { "$ref": "#/components/schemas/Perfil" } }
+        }
+      },
+      "Dashboard": {
+        "type": "object",
+        "properties": {
+          "quantidadeFuncionarios": { "type": "integer", "example": 1 },
+          "quantidadeUsuarios":     { "type": "integer", "example": 1 },
+          "quantidadeTreinamentos": { "type": "integer", "example": 1 },
+          "quantidadeInstrutores":  { "type": "integer", "example": 1 },
+          "quantidadeCertificados": { "type": "integer", "example": 1 }
+        }
+      },
+      "TreinamentoCompleto": {
+        "type": "object",
+        "properties": {
+          "treinamento": { "$ref": "#/components/schemas/Treinamento" },
+          "instrutores": { "type": "array", "items": { "$ref": "#/components/schemas/Instrutor" } },
+          "responsaveis":{ "type": "array", "items": { "$ref": "#/components/schemas/Usuario" } },
+          "participantes":{ "type": "array", "items": { "$ref": "#/components/schemas/TreinamentoParticipante" } },
+          "evidencias":  { "type": "array", "items": { "$ref": "#/components/schemas/Evidencia" } }
+        }
+      },
+      "CertificadoCompleto": {
+        "type": "object",
+        "properties": {
+          "certificado": { "$ref": "#/components/schemas/Certificado" },
+          "participante":{ "$ref": "#/components/schemas/TreinamentoParticipante" },
+          "funcionario": { "$ref": "#/components/schemas/Funcionario" },
+          "treinamento": { "$ref": "#/components/schemas/Treinamento" }
+        }
+      },
+      "ErroNaoEncontrado": {
+        "type": "object",
+        "properties": {
+          "erro": { "type": "string", "example": "Recurso não encontrado" }
+        }
+      },
+      "ErroResposta": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean", "example": false },
+          "error": {
+            "type": "object",
+            "properties": {
+              "code":    { "type": "string", "example": "NOT_FOUND" },
+              "message": { "type": "string", "example": "Registro não encontrado." }
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Token fake de autenticação. Use o valor: token-fake"
+      }
+    }
+  }
+}

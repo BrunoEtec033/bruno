@@ -1,0 +1,151 @@
+{
+  "funcionarios": [
+    {
+      "id": 1,
+      "nome": "Carlos Souza",
+      "matricula": "F001",
+      "cargo": "Analista de Qualidade",
+      "setor": "Qualidade"
+    }
+  ],
+  "instrutores": [
+    {
+      "id": 1,
+      "nome": "Marcos Oliveira",
+      "especialidade": "Segurança do Trabalho",
+      "registro": "CREA-SP-123456",
+      "email": "marcos.oliveira@empresa.com",
+      "interno": true
+    }
+  ],
+  "usuarios": [
+    {
+      "id": 1,
+      "email": "carlo.souza@empresa.com",
+      "senha": "senhaSegura123",
+      "funcionarioId": 1,
+      "ativo": true,
+      "criadoEm": "2026-01-10T08:00:00.000Z"
+    }
+  ],
+  "permissoes": [
+    {
+      "id": 1,
+      "codigo": "TREINAMENTOS:LISTAR",
+      "recurso": "treinamentos",
+      "metodo": "GET",
+      "rotaTemplate": "/treinamentos",
+      "descricao": "Permite visualizar a lista de treinamentos",
+      "ehPublico": false
+    },
+    {
+      "id": 2,
+      "codigo": "TREINAMENTOS:CRIAR",
+      "recurso": "treinamentos",
+      "metodo": "POST",
+      "rotaTemplate": "/treinamentos",
+      "descricao": "Permite criar novos treinamentos",
+      "ehPublico": false
+    }
+  ],
+  "perfis": [
+    {
+      "id": 1,
+      "nome": "Administrador",
+      "descricao": "Acesso total ao sistema"
+    }
+  ],  
+  "perfilPermissoes": [
+    {
+      "id": 1,
+      "perfilId": 1,
+      "permissaoId": 1
+    },
+    {
+      "id": 2,
+      "perfilId": 1,
+      "permissaoId": 2
+    }
+  ],
+  "usuarioPerfis": [
+    {
+      "id": 1,
+      "usuarioId": 1,
+      "perfilId": 1
+    }
+  ],  
+  "treinamentos": [
+    {
+      "id": 1,
+      "titulo": "NR-35 - Trabalho em Altura",
+      "descricao": "Treinamento obrigatório conforme Norma Regulamentadora 35",
+      "cargaHoraria": 8,
+      "status": "concluido", 
+      "dataInicio": "2026-03-10T08:00:00.000Z",
+      "dataFim": "2026-03-10T17:00:00.000Z"
+    }
+  ],
+  "treinamentoResponsaveis": [
+    {
+      "id": 1,
+      "treinamentoId": 1,
+      "usuarioId": 1
+    }
+  ],
+  "treinamentoInstrutores": [
+    {
+      "id": 1,
+      "treinamentoId": 1,
+      "instrutorId": 1
+    }
+  ],
+  "treinamentoParticipantes": [
+    {
+      "id": 1,
+      "treinamentoId": 1,
+      "funcionarioId": 1,
+      "status": "aprovado",
+      "inscritoEm": "2026-03-01T09:00:00.000Z"
+    }
+  ],
+  "assinaturas": [
+    {
+      "id": 1,
+      "treinamentoParticipantesId": 1,
+      "tipo": "lista_de_presenca",
+      "assinadoEm": "2026-03-10T08:30:00.000Z",
+      "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "evidencias": [
+    {
+      "id": 1,
+      "treinamentoId": 1,
+      "tipo": "foto",
+      "descricao": "Foto do participante durante a prática em altura",
+      "arquivo": "evidencia_carlos_souza_nr35_2026.jpg",
+      "registradoEm": "2026-03-10T14:00:00.000Z"
+    }
+  ],
+  "certificados": [
+    {
+      "id": 1,
+      "treinamentoParticipantesId": 1,
+      "numero": "CERT-2026-0001",
+      "dataEmissao": "2026-03-11T08:00:00.000Z",
+      "dataValidade": "2027-03-11T08:00:00.000Z",
+      "status": "valido"
+    }
+  ],
+  "auditorias": [
+    {
+      "id": 1,
+      "entidade": "certificados",
+      "entidadeId": 1,
+      "acao": "criacao",
+      "usuarioId": 1,
+      "detalhe": "Certificado CERT-2026-0001 emitido para Carlos Souza (NR-35)",
+      "realizadoEm": "2026-03-11T08:01:00.000Z"
+    }
+  ]
+}
