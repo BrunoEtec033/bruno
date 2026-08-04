@@ -3,19 +3,19 @@
 
 module.exports = {
   // Simular atraso nas respostas da API
-  simularLatencia: true,
+  simularLatencia: false,
   latenciaMinima: 200,      // ms
   latenciaMaxima: 500,      // ms
 
   // Exigir Authorization: Bearer token-fake nos endpoints privados
-  simularAutenticacao: true,
+  simularAutenticacao: false,
 
   // Retornar 403 em endpoints que requerem permissões específicas
   // Enviar header x-permissoes: <PERMISSAO> para liberar o acesso
-  simularPermissoes: true,
+  simularPermissoes: false,
 
   // Validar campos obrigatórios (400) e conflitos de dados (409)
-  simularErros: true,
+  simularErros: false,
 
   // Exibir headers das requisições no console de log
   modoDebug: false

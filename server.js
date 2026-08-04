@@ -325,8 +325,6 @@ server.get('/api/certificados/:id/completo', (req, res) => {
 
 // ─── Validação antes do roteador json-server ──────────────────────────────────
 
-server.use(express.json());
-server.use(express.urlencoded({ extended: false }));
 server.use(validarRequisicao);
 
 // ─── Reescrita e roteador do json-server ──────────────────────────────────────

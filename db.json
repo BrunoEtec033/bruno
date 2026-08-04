@@ -6,6 +6,13 @@
       "matricula": "F001",
       "cargo": "Analista de Qualidade",
       "setor": "Qualidade"
+    },
+    {
+      "nome": "Maria Oliveira",
+      "matricula": "F002",
+      "cargo": "Técnico de Segurança",
+      "setor": "Operações",
+      "id": 2
     }
   ],
   "instrutores": [
@@ -54,7 +61,7 @@
       "nome": "Administrador",
       "descricao": "Acesso total ao sistema"
     }
-  ],  
+  ],
   "perfilPermissoes": [
     {
       "id": 1,
@@ -73,14 +80,14 @@
       "usuarioId": 1,
       "perfilId": 1
     }
-  ],  
+  ],
   "treinamentos": [
     {
       "id": 1,
       "titulo": "NR-35 - Trabalho em Altura",
       "descricao": "Treinamento obrigatório conforme Norma Regulamentadora 35",
       "cargaHoraria": 8,
-      "status": "concluido", 
+      "status": "concluido",
       "dataInicio": "2026-03-10T08:00:00.000Z",
       "dataFim": "2026-03-10T17:00:00.000Z"
     }
