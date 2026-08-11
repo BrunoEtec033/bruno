@@ -713,7 +713,7 @@ Somente depois dessa fundação começaremos a implementar as Features.
 
 # 18. Pergunta final
 
-Antes de encerrar a aula, cada equipe deverá responder:
+Antes de encerrar o planejamento da arquitetura:
 
 > **"Se outra equipe receber nosso projeto daqui a seis meses, ela conseguirá entender onde está cada funcionalidade e descobrir rapidamente onde deve fazer uma alteração?"**
 
