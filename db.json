@@ -13,6 +13,13 @@
       "cargo": "Técnico de Segurança",
       "setor": "Operações",
       "id": 2
+    },
+    {
+      "nome": "Marlene Silva do Santos",
+      "matricula": "F003",
+      "cargo": "Técnico de Segurança",
+      "setor": "Operações",
+      "id": 3
     }
   ],
   "instrutores": [
@@ -33,6 +40,14 @@
       "funcionarioId": 1,
       "ativo": true,
       "criadoEm": "2026-01-10T08:00:00.000Z"
+    },
+    {
+      "email": "marlene@empresa.com",
+      "senha": "senha123",
+      "funcionarioId": 3,
+      "ativo": true,
+      "criadoEm": "2026-08-04T00:00:00.000Z",
+      "id": 2
     }
   ],
   "permissoes": [
