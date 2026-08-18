@@ -27,7 +27,7 @@ Por isso, antes de desenvolver as telas, precisamos definir uma arquitetura que 
 
 # 2. Objetivo da aula
 
-Ao final desta aula, o aluno deverá ser capaz de:
+Ao final desta aula, você deverá ser capaz de:
 
 - analisar uma documentação de API;
 - identificar funcionalidades de uma aplicação;
