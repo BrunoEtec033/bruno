@@ -11,6 +11,7 @@ O aplicativo será desenvolvido utilizando:
 - React Native;
 - Expo;
 - TypeScript;
+- React Native Paper
 - API REST;
 - Mock API disponibilizada para o projeto.
 
