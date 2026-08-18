@@ -495,26 +495,37 @@ Proponha um fluxo inicial.
 Uma possibilidade:
 
 ```text
-                 Aplicativo
-                     │
-          ┌──────────┴──────────┐
-          │                     │
-       Usuário                 Login
-      autenticado                │
-          │                      │
-          └──────────┬───────────┘
-                     │
-                 Dashboard
-                     │
-       ┌─────────────┼─────────────┐
-       │             │             │
- Treinamentos   Certificados     Perfil
-       │
-       ↓
-Lista
-       │
-       ↓
-Detalhes
+                        Aplicativo
+                             │
+                             ▼
+                    Verificar autenticação
+                             │
+                    ┌────────┴────────┐
+                    │                 │
+                  SIM                NÃO
+                    │                 │
+                    |                 ▼
+                    |                Login
+                    |               /
+                    |             /
+                    |           /
+                    |         /
+                    |       /                                      
+                    ▼      ▼
+                    Dashboard         
+                    │                 
+          ┌─────────┼─────────┐       
+          │         │         │      
+          ▼         ▼         ▼       
+    Treinamentos Certificados Perfil 
+          │                          
+          ▼                          
+        Lista                        
+          │                          
+          ▼                         
+      Detalhes                      
+                                     
+                        
 ```
 
 Não é obrigatório utilizar exatamente esse fluxo.
