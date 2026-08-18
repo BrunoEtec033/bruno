@@ -470,7 +470,7 @@ Agora responda:
 
 ### Se a URL da API mudar, quantos arquivos do aplicativo deveriam precisar ser modificados?
 
-Idealmente, uma alteração de infraestrutura não deveria obrigar o professor ou a equipe a procurar chamadas HTTP espalhadas por dezenas de telas.
+Idealmente, uma alteração de infraestrutura não deveria obrigar a equipe a procurar chamadas HTTP espalhadas por dezenas de telas.
 
 Essa é uma das razões pelas quais estamos separando:
 
